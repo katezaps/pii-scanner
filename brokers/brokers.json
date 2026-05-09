@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "brokers": [
+    {
+      "key": "spokeo",
+      "name": "Spokeo",
+      "search_url": "https://www.spokeo.com/search"
+    },
+    {
+      "key": "whitepages",
+      "name": "WhitePages",
+      "search_url": "https://www.whitepages.com/name"
+    },
+    {
+      "key": "beenverified",
+      "name": "BeenVerified",
+      "search_url": "https://www.beenverified.com/people"
+    },
+    {
+      "key": "radaris",
+      "name": "Radaris",
+      "search_url": "https://radaris.com/p/search"
+    },
+    {
+      "key": "mylife",
+      "name": "MyLife",
+      "search_url": "https://www.mylife.com/pub-multisearch.pubview"
+    }
+  ]
+}

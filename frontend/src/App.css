@@ -1,0 +1,148 @@
+/* ── Layout ────────────────────────────────────────────────────────── */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100dvh;
+  padding: 0 24px;
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+
+.header {
+  position: relative;
+  text-align: center;
+  padding: 80px 0 48px;
+}
+
+.header__glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  translate: -50% 0;
+  width: 480px;
+  height: 260px;
+  background: radial-gradient(
+    ellipse at center,
+    var(--accent-glow) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.logo {
+  position: relative;
+  z-index: 1;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  background: linear-gradient(135deg, var(--teal-700), var(--teal-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  position: relative;
+  z-index: 1;
+  margin-top: 8px;
+  font-size: 1.125rem;
+  color: var(--text-muted);
+}
+
+/* ── Card grid ─────────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 720px;
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Card ──────────────────────────────────────────────────────────── */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 28px 24px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  font-family: inherit;
+  color: inherit;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--teal-300);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.card--active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.card__icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.card__title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--teal-800);
+}
+
+.card__desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.card__arrow {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 1.25rem;
+  color: var(--teal-300);
+  transition: color 0.2s ease, translate 0.2s ease;
+}
+
+.card:hover .card__arrow {
+  color: var(--accent);
+  translate: 4px 0;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+
+.footer {
+  margin-top: auto;
+  padding: 32px 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}

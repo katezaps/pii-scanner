@@ -1,0 +1,246 @@
+.brokers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100dvh;
+  padding: 0 24px 64px;
+}
+
+.brokers__glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  translate: -50% 0;
+  width: 480px;
+  height: 260px;
+  background: radial-gradient(
+    ellipse at center,
+    var(--accent-glow) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+
+.brokers__header {
+  position: relative;
+  text-align: center;
+  padding: 48px 0 32px;
+}
+
+.brokers__footer {
+  margin-top: 40px;
+  padding-bottom: 48px;
+}
+
+.brokers__back {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--sans);
+  color: var(--accent);
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.brokers__back:hover {
+  background: var(--accent-light);
+}
+
+.brokers__title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--teal-700), var(--teal-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brokers__subtitle {
+  margin-top: 8px;
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.brokers__error {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+
+/* ── Table ────────────────────────────────────────────────────── */
+
+.brokers__table-wrap {
+  width: 100%;
+  max-width: 800px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  background: var(--surface);
+}
+
+.brokers__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.brokers__th {
+  padding: 14px 20px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--teal-700);
+  background: var(--teal-50);
+  border-bottom: 2px solid var(--border);
+}
+
+.brokers__th--expand {
+  width: 40px;
+}
+
+.brokers__row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.brokers__row:not(:last-child) .brokers__td {
+  border-bottom: 1px solid var(--teal-100);
+}
+
+.brokers__row:hover {
+  background: var(--teal-50);
+}
+
+.brokers__row--open {
+  background: var(--teal-50);
+}
+
+.brokers__td {
+  padding: 16px 20px;
+  vertical-align: top;
+  font-size: 0.95rem;
+}
+
+.brokers__td--name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.brokers__name {
+  display: block;
+}
+
+/* ── Expanded details ─────────────────────────────────────────── */
+
+.brokers__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--teal-200);
+  animation: brokers-slide-in 0.2s ease-out;
+}
+
+@keyframes brokers-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.brokers__detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brokers__detail-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--teal-600);
+}
+
+.brokers__detail-value {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text);
+}
+
+/* ── URL column ───────────────────────────────────────────────── */
+
+.brokers__link {
+  color: var(--teal-600);
+  text-decoration: none;
+  font-size: 0.85rem;
+  word-break: break-all;
+  transition: color 0.15s;
+}
+
+.brokers__link:hover {
+  color: var(--teal-800);
+  text-decoration: underline;
+}
+
+/* ── Chevron ──────────────────────────────────────────────────── */
+
+.brokers__td--chevron {
+  text-align: center;
+  width: 40px;
+}
+
+.brokers__chevron {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.brokers__chevron--open {
+  transform: rotate(90deg);
+}
+
+/* ── Mobile ───────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .brokers__table-wrap {
+    border-radius: 8px;
+  }
+
+  .brokers__th,
+  .brokers__td {
+    padding: 12px 14px;
+  }
+
+  .brokers__title {
+    font-size: 1.75rem;
+  }
+
+  .brokers__back {
+    position: static;
+    margin-bottom: 16px;
+  }
+
+  .brokers__details {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
