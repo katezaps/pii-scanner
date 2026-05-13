@@ -1,21 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import type { AgentResult, PendingBroker, AcceptedField, BrokerOut } from "../api";
 import PiiForm from "../components/PiiForm";
 import type { IdentityFields } from "../components/PiiForm";
 import BrokerChecklist from "../components/BrokerChecklist";
 import ConsentModal from "../components/ConsentModal";
 import ScanProgress from "../components/ScanProgress";
-import type { AgentResult, PendingBroker } from "../components/ScanProgress";
 import ScanHistory from "../components/ScanHistory";
-import type { ScanRun, AcceptedField } from "../components/ScanHistory";
+import type { ScanRun } from "../components/ScanHistory";
 import "./Audit.css";
-
-interface Broker {
-  key: string;
-  name: string;
-  search_url: string;
-}
 
 const CACHE_KEY = "pii-scanner-scan-cache";
 
@@ -51,7 +45,7 @@ function saveHistoryCache(history: ScanHistory_) {
 export default function Audit() {
   const navigate = useNavigate();
   const { auth } = useAuth();
-  const [brokers, setBrokers] = useState<Broker[]>([]);
+  const [brokers, setBrokers] = useState<BrokerOut[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [identity, setIdentity] = useState<IdentityFields>({
     email: "", phone: "", name: "", address: "",

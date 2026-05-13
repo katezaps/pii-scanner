@@ -1,13 +1,8 @@
+import type { BrokerOut } from "../api";
 import "./BrokerChecklist.css";
 
-interface Broker {
-  key: string;
-  name: string;
-  search_url: string;
-}
-
 interface BrokerChecklistProps {
-  brokers: Broker[];
+  brokers: BrokerOut[];
   selected: Set<string>;
   onToggle: (key: string) => void;
   onToggleAll: () => void;

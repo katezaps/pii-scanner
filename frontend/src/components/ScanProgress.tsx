@@ -1,29 +1,8 @@
+import type { AgentResult, PendingBroker } from "../api";
 import BrokerRow from "./BrokerRow";
 import type { BrokerRowData } from "./BrokerRow";
 import { compareBrokerResults } from "../sort";
 import "./ScanProgress.css";
-
-interface FormFieldMatch {
-  identity_field: string;
-  form_input: string;
-  found: boolean | null;
-}
-
-interface AgentResult {
-  name: string;
-  search_url: string;
-  status_code: number | null;
-  content_length: number | null;
-  message: string | null;
-  input_fields_found: string[];
-  matched_inputs: FormFieldMatch[];
-  opt_out_url: string | null;
-}
-
-interface PendingBroker {
-  name: string;
-  search_url: string;
-}
 
 function agentResultToRow(name: string, r: AgentResult): BrokerRowData {
   const wasCancelled = r.message === "Cancelled.";
@@ -54,7 +33,6 @@ interface ScanProgressProps {
   scanStartTime: number | null;
 }
 
-export type { AgentResult, PendingBroker };
 export { agentResultToRow };
 
 export default function ScanProgress({

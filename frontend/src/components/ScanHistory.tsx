@@ -1,23 +1,16 @@
+import type { AgentResult, PendingBroker, AcceptedField } from "../api";
 import BrokerRow from "./BrokerRow";
 import { agentResultToRow } from "./ScanProgress";
-import type { AgentResult, PendingBroker } from "./ScanProgress";
 import { compareBrokerResults } from "../sort";
 import "./ScanHistory.css";
 
-interface AcceptedField {
-  field_type: string;
-  status: string;
-}
-
-interface ScanRun {
+export interface ScanRun {
   id: number;
   name: string | null;
   pending: PendingBroker[];
   results: Record<string, AgentResult>;
   accepted: AcceptedField[];
 }
-
-export type { ScanRun, AcceptedField };
 
 interface ScanHistoryProps {
   runs: ScanRun[];

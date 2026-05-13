@@ -1,22 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import type { BrokerOut, BrokersResponse } from "../api";
 import "./Brokers.css";
-
-interface Broker {
-  version: number;
-  key: string;
-  name: string;
-  search_url: string;
-  created_at: string;
-  opt_out_url: string | null;
-  opt_out_url_source: string | null;
-}
-
-interface BrokersResponse {
-  version: number;
-  brokers: Broker[];
-}
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
