@@ -1,30 +1,35 @@
 {
-  "version": 1,
+  "version": 2,
   "brokers": [
     {
       "key": "spokeo",
       "name": "Spokeo",
-      "search_url": "https://www.spokeo.com/search"
+      "search_url": "https://www.spokeo.com/search",
+      "opt_out_url": "https://www.spokeo.com/optout"
     },
     {
       "key": "whitepages",
       "name": "WhitePages",
-      "search_url": "https://www.whitepages.com/name"
+      "search_url": "https://www.whitepages.com/name",
+      "opt_out_url": "https://www.whitepages.com/suppression-requests"
     },
     {
       "key": "beenverified",
       "name": "BeenVerified",
-      "search_url": "https://www.beenverified.com/people"
+      "search_url": "https://www.beenverified.com/people",
+      "opt_out_url": "https://www.beenverified.com/opt-out"
     },
     {
       "key": "radaris",
       "name": "Radaris",
-      "search_url": "https://radaris.com/p/search"
+      "search_url": "https://radaris.com/p/search",
+      "opt_out_url": "https://radaris.com/page/how-to-remove"
     },
     {
       "key": "mylife",
       "name": "MyLife",
-      "search_url": "https://www.mylife.com/pub-multisearch.pubview"
+      "search_url": "https://www.mylife.com/pub-multisearch.pubview",
+      "opt_out_url": "https://www.mylife.com/privacyrequest"
     }
   ]
 }

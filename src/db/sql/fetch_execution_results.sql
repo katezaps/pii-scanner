@@ -6,7 +6,8 @@ SELECT
     bfs.message,
     b.key AS broker_key,
     b.name AS broker_name,
-    b.search_url
+    b.search_url,
+    b.opt_out_url
 FROM scan_execution_results ser
 JOIN broker_field_scans bfs ON bfs.id = ser.broker_field_scan_id
 JOIN brokers b ON b.id = bfs.broker_id

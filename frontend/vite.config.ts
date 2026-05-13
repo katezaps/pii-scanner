@@ -7,7 +7,14 @@ export default defineConfig({
     proxy: {
       '/me': 'http://localhost:8000',
       '/health': 'http://localhost:8000',
-      '/brokers': 'http://localhost:8000',
+      '/brokers': {
+        target: 'http://localhost:8000',
+        bypass(req) {
+          if (req.headers.accept?.includes('text/html')) {
+            return req.url;
+          }
+        },
+      },
       '/audit': {
         target: 'http://localhost:8000',
         bypass(req) {

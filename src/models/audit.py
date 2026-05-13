@@ -31,6 +31,7 @@ class AuditAgentResultOut(BaseModel):
     message: str | None
     input_fields_found: list[str]
     matched_inputs: list[FormFieldMatchOut]
+    opt_out_url: str | None = None
 
 
 class AcceptedField(BaseModel):

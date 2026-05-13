@@ -34,6 +34,7 @@ class _BrokerEntry(BaseModel):
     key: str = Field(min_length=1, max_length=100, pattern=r"^[a-z0-9_-]+$")
     name: str = Field(min_length=1, max_length=200)
     search_url: str = Field(min_length=1, max_length=2000)
+    opt_out_url: str | None = None
 
 
 class _BrokerManifest(BaseModel):
@@ -72,6 +73,8 @@ async def _seed(manifest: _BrokerManifest) -> None:
                         broker.key,
                         broker.name,
                         broker.search_url,
+                        broker.opt_out_url,
+                        "SEED" if broker.opt_out_url else None,
                     ),
                 )
                 row = await cur.fetchone()

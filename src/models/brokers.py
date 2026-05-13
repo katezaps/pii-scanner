@@ -11,6 +11,8 @@ class BrokerOut(BaseModel):
     name: str
     search_url: str
     created_at: datetime
+    opt_out_url: str | None = None
+    opt_out_url_source: str | None = None
 
 
 class BrokersResponse(BaseModel):

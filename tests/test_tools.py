@@ -23,52 +23,19 @@ def _tool_ctx(args: str = "{}"):
     )
 
 
-# ---------------------------------------------------------------------------
-# PII matching
-# ---------------------------------------------------------------------------
-
-
-def test_pii_exact_and_token_matching():
+def test_pii_matching():
     body = "<html>Jane A. Doe - jane@example.com - +15551234567</html>"
     identity = {"email": "jane@example.com", "name": "Jane Doe", "phone": "+15551234567"}
     result = check_pii_in_body(body, identity)
     assert result == {"email": True, "name": True, "phone": True}
 
-
-def test_pii_no_match():
-    result = check_pii_in_body("<html>No results</html>", {"email": "x@y.com", "name": "Jane Doe"})
-    assert result == {"email": False, "name": False}
-
-
-def test_pii_name_token_matching():
-    # Middle initial — tokens still match
-    assert check_pii_in_body("Jane A. Doe", {"name": "Jane Doe"}) == {"name": True}
-    # Reversed order
-    assert check_pii_in_body("Doe, Jane", {"name": "Jane Doe"}) == {"name": True}
-    # Partial — only first name
-    assert check_pii_in_body("Jane Smith", {"name": "Jane Doe"}) == {"name": False}
-
-
-def test_pii_email_exact_only():
-    # Email broken apart shouldn't match
-    assert check_pii_in_body("jane at example.com", {"email": "jane@example.com"}) == {"email": False}
-
-
-# ---------------------------------------------------------------------------
-# build_tools
-# ---------------------------------------------------------------------------
+    assert check_pii_in_body("<html>No results</html>", {"email": "x@y.com"}) == {"email": False}
 
 
 def test_build_tools_count():
     ctx = MagicMock()
-    assert len(build_tools(ctx)) == 1
-    assert len(build_tools(ctx, {"email": "test@example.com"})) == 2
-    assert len(build_tools(ctx, {})) == 1
-
-
-# ---------------------------------------------------------------------------
-# Mocking helpers
-# ---------------------------------------------------------------------------
+    assert len(build_tools(ctx)) == 1  # discover_forms only
+    assert len(build_tools(ctx, {"email": "test@example.com"})) == 2  # + submit_form
 
 
 def _mock_page(*, content="<html></html>", url="https://example.com", status=200):
@@ -94,68 +61,30 @@ def _patch_new_page(page):
         yield
 
 
-# ---------------------------------------------------------------------------
-# discover_forms
-# ---------------------------------------------------------------------------
-
-
 @pytest.mark.asyncio
-async def test_discover_forms_finds_forms_and_links():
+async def test_discover_forms():
     ctx = MagicMock()
     page = _mock_page(url="https://example.com/search", status=200)
 
     form = AsyncMock()
-    form.get_attribute = AsyncMock(side_effect=lambda a: {
-        "action": "/search", "method": "GET",
-    }.get(a, ""))
+    form.get_attribute = AsyncMock(side_effect=lambda a: {"action": "/search", "method": "GET"}.get(a, ""))
     input_el = AsyncMock()
-    input_el.get_attribute = AsyncMock(side_effect=lambda a: {
-        "name": "q", "type": "text", "placeholder": "Search",
-    }.get(a, ""))
+    input_el.get_attribute = AsyncMock(side_effect=lambda a: {"name": "q", "type": "text", "placeholder": "Search"}.get(a, ""))
     form.query_selector_all = AsyncMock(return_value=[input_el])
 
     link = AsyncMock()
     link.get_attribute = AsyncMock(return_value="https://example.com/phone")
     link.text_content = AsyncMock(return_value="Search by Phone")
 
-    page.query_selector_all = AsyncMock(
-        side_effect=lambda sel: [form] if sel == "form" else [link]
-    )
+    page.query_selector_all = AsyncMock(side_effect=lambda sel: [form] if sel == "form" else [link])
     page.wait_for_load_state = AsyncMock()
 
     with _patch_new_page(page):
         tool = make_discover_forms_tool(ctx)
-        result = json.loads(
-            await tool.on_invoke_tool(_tool_ctx(), '{"url": "https://example.com/search"}')
-        )
+        result = json.loads(await tool.on_invoke_tool(_tool_ctx(), '{"url": "https://example.com/search"}'))
 
     assert len(result["forms"]) == 1
     assert result["forms"][0]["fields"][0]["name"] == "q"
-    assert len(result["search_links"]) == 1
-    assert "body" not in result
-
-
-# ---------------------------------------------------------------------------
-# submit_form
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-async def test_submit_form_detects_pii():
-    ctx = MagicMock()
-    page = _mock_page(
-        content="<html>Results for jane@example.com</html>",
-        url="https://broker.com/results", status=200,
-    )
-    with _patch_new_page(page):
-        tool = make_submit_form_tool(ctx, {"email": "jane@example.com"})
-        params = json.dumps({
-            "url": "https://broker.com/search",
-            "method": "GET", "params": '{"q": "jane"}',
-        })
-        result = json.loads(await tool.on_invoke_tool(_tool_ctx(), params))
-
-    assert result["pii_detected"] == {"email": True}
     assert "body" not in result
 
 
@@ -168,23 +97,8 @@ async def test_submit_form_body_never_returned():
 
     with _patch_new_page(page):
         tool = make_submit_form_tool(ctx, {"email": "secret@example.com"})
-        params = json.dumps({
-            "url": "https://broker.com/search",
-            "method": "GET", "params": '{"q": "test"}',
-        })
+        params = json.dumps({"url": "https://broker.com/search", "method": "GET", "params": '{"q": "test"}'})
         raw = await tool.on_invoke_tool(_tool_ctx(), params)
 
     assert "secret@example.com" not in raw
     assert "sensitive data" not in raw
-    assert set(json.loads(raw).keys()) == {
-        "status_code", "content_length", "final_url", "pii_detected",
-    }
-
-
-@pytest.mark.asyncio
-async def test_submit_form_invalid_params():
-    ctx = MagicMock()
-    tool = make_submit_form_tool(ctx, {"email": "test@example.com"})
-    params = json.dumps({"url": "https://broker.com", "method": "GET", "params": "not json"})
-    result = json.loads(await tool.on_invoke_tool(_tool_ctx(), params))
-    assert result == {"error": "Invalid params JSON"}

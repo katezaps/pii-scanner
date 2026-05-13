@@ -62,7 +62,13 @@ async def stream_audit_agents(
     broker_by_task: dict[asyncio.Task, dict] = {}
     for broker in brokers:
         task = asyncio.create_task(
-            audit_broker(broker["name"], broker["search_url"], identity, settings=settings),
+            audit_broker(
+                broker["name"],
+                broker["search_url"],
+                identity,
+                settings=settings,
+                db_opt_out_url=broker.get("opt_out_url"),
+            ),
             name=f"audit-{broker['name']}",
         )
         broker_by_task[task] = broker

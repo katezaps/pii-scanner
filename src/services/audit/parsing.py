@@ -31,10 +31,11 @@ def _validate_str_or_none(value: object, field_name: str) -> str | None:
 
 
 def extract_tool_metadata(items) -> dict:
-    """Extract status_code, content_length, and message from tool call outputs."""
+    """Extract status_code, content_length, message, and opt_out_url from tool call outputs."""
     status_code = None
     content_length = None
     message = None
+    opt_out_url = None
 
     for item in items:
         if hasattr(item, "output") and isinstance(item.output, str):
@@ -48,6 +49,11 @@ def extract_tool_metadata(items) -> dict:
                     )
                 if "error" in parsed and message is None:
                     message = _validate_str_or_none(parsed["error"], "error")
+                if "opt_out_pages" in parsed and opt_out_url is None:
+                    pages = parsed["opt_out_pages"]
+                    if isinstance(pages, list) and pages:
+                        url = pages[0].get("url") if isinstance(pages[0], dict) else None
+                        opt_out_url = _validate_str_or_none(url, "opt_out_url")
             except (json.JSONDecodeError, TypeError):
                 pass
 
@@ -55,6 +61,7 @@ def extract_tool_metadata(items) -> dict:
         "status_code": status_code,
         "content_length": content_length,
         "message": message,
+        "opt_out_url": opt_out_url,
     }
 
 
@@ -68,6 +75,7 @@ def parse_final_output(raw_output: str, meta: dict) -> tuple[dict, list[str], li
     status_code = meta["status_code"]
     content_length = meta["content_length"]
     message = meta["message"]
+    opt_out_url = meta.get("opt_out_url")
     input_fields_found: list[str] = []
     matched_inputs: list[FormFieldMatch] = []
 
@@ -81,6 +89,7 @@ def parse_final_output(raw_output: str, meta: dict) -> tuple[dict, list[str], li
             "status_code": status_code,
             "content_length": content_length,
             "message": message,
+            "opt_out_url": opt_out_url,
         }
         return merged, input_fields_found, matched_inputs
 
@@ -92,6 +101,7 @@ def parse_final_output(raw_output: str, meta: dict) -> tuple[dict, list[str], li
             "status_code": status_code,
             "content_length": content_length,
             "message": message,
+            "opt_out_url": opt_out_url,
         }
         return merged, input_fields_found, matched_inputs
 
@@ -133,6 +143,7 @@ def parse_final_output(raw_output: str, meta: dict) -> tuple[dict, list[str], li
         "status_code": status_code,
         "content_length": content_length,
         "message": message,
+        "opt_out_url": opt_out_url,
     }
     return merged, input_fields_found, matched_inputs
 

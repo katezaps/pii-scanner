@@ -225,30 +225,34 @@ async def _scan(identity: dict[str, str], broker_list: list[dict], settings):
                     f" {', '.join(found_fields)}"
                     f" [yellow]({r.message})[/yellow]"
                 )
-                violations.append(
-                    f"  {icon} [bold]{r.name}[/bold] — {detail}"
-                )
+                line = f"  {icon} [bold]{r.name}[/bold] — {detail}"
+                if r.opt_out_url:
+                    line += f"\n       [blue]Opt out: {r.opt_out_url}[/blue]"
+                violations.append(line)
                 continue
             icon = "[yellow]![/yellow]"
             detail = f"[yellow]{r.message}[/yellow]"
-            incomplete_lines.append(
-                f"  {icon} [bold]{r.name}[/bold] — {detail}"
-            )
+            line = f"  {icon} [bold]{r.name}[/bold] — {detail}"
+            if r.opt_out_url:
+                line += f"\n       [blue]Opt out: {r.opt_out_url}[/blue]"
+            incomplete_lines.append(line)
         elif r.matched_inputs and any(m.found for m in r.matched_inputs):
             icon = "[red bold]!![/red bold]"
             found = [m.identity_field for m in r.matched_inputs if m.found]
             detail = (
                 f"[red bold]PII DETECTED:[/red bold] {', '.join(found)}"
             )
-            violations.append(
-                f"  {icon} [bold]{r.name}[/bold] — {detail}"
-            )
+            line = f"  {icon} [bold]{r.name}[/bold] — {detail}"
+            if r.opt_out_url:
+                line += f"\n       [blue]Opt out: {r.opt_out_url}[/blue]"
+            violations.append(line)
         else:
             icon = "[green]✓[/green]"
             detail = "[green]clear[/green]"
-            clear_lines.append(
-                f"  {icon} [bold]{r.name}[/bold] — {detail}"
-            )
+            line = f"  {icon} [bold]{r.name}[/bold] — {detail}"
+            if r.opt_out_url:
+                line += f"\n       [blue]Opt out: {r.opt_out_url}[/blue]"
+            clear_lines.append(line)
 
     for line in violations + clear_lines + incomplete_lines:
         console.print(line)
