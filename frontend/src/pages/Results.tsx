@@ -14,6 +14,7 @@ interface FetchResult {
   state: string;
   found: boolean;
   message: string | null;
+  opt_out_url: string | null;
 }
 
 interface FetchResponse {
@@ -48,15 +49,18 @@ function groupByBroker(results: FetchResult[]): BrokerRowData[] {
     if (r.field_type === "_status") {
       statusStates.set(r.broker_id, { state: r.state, message: r.message });
       if (!map.has(r.broker_id)) {
-        map.set(r.broker_id, { name: r.broker_name, state: "SUCCESS", message: null, fields: [], foundCount: 0 });
+        map.set(r.broker_id, { name: r.broker_name, state: "SUCCESS", message: null, fields: [], foundCount: 0, optOutUrl: r.opt_out_url });
       }
       continue;
     }
 
     let row = map.get(r.broker_id);
     if (!row) {
-      row = { name: r.broker_name, state: "SUCCESS", message: null, fields: [], foundCount: 0 };
+      row = { name: r.broker_name, state: "SUCCESS", message: null, fields: [], foundCount: 0, optOutUrl: r.opt_out_url };
       map.set(r.broker_id, row);
+    }
+    if (r.opt_out_url && !row.optOutUrl) {
+      row.optOutUrl = r.opt_out_url;
     }
     row.fields.push({ field_type: r.field_type, found: r.found });
     if (r.found) {

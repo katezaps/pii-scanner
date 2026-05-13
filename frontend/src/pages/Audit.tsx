@@ -26,6 +26,7 @@ interface AgentResult {
   message: string | null;
   input_fields_found: string[];
   matched_inputs: FormFieldMatch[];
+  opt_out_url: string | null;
 }
 
 interface PendingBroker {
@@ -104,6 +105,7 @@ function agentResultToRow(name: string, r: AgentResult): BrokerRowData {
     message: r.message,
     fields: detected.map((m) => ({ field_type: m.identity_field, found: true })),
     foundCount: detected.length,
+    optOutUrl: r.opt_out_url,
   };
 }
 

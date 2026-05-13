@@ -186,6 +186,13 @@ async def _persist_agent_result(
                 (execution_id, bfs_row["id"], "FRESH"),
             )
 
+        # Cache a newly discovered opt-out URL on the broker row.
+        if result.opt_out_url:
+            await cur.execute(
+                sql("broker_set_opt_out_url"),
+                {"search_url": result.search_url, "opt_out_url": result.opt_out_url},
+            )
+
         # Mark the _status marker as SUCCESS now that the broker completed
         status_hash = _status_field_name(result.name, execution_id)
         await cur.execute(
@@ -233,7 +240,7 @@ async def run_agents(
             identity[field_type] = value.strip()
 
     brokers = await resolve_brokers(payload.broker_keys)
-    broker_list = [{"name": b["name"], "search_url": b["search_url"]} for b in brokers]
+    broker_list = [dict(b) for b in brokers]
 
     save = payload.save
     scan_name = payload.scan_name
@@ -348,7 +355,7 @@ async def run_agents(
 
             try:
                 async for r in stream_audit_agents(
-                    broker_keys=list(payload.broker_keys),
+                    brokers=broker_list,
                     identity=identity if identity else None,
                 ):
                     if save and execution_id is not None:
@@ -390,6 +397,7 @@ async def run_agents(
                             )
                             for m in r.matched_inputs
                         ],
+                        opt_out_url=r.opt_out_url,
                     )
                     yield {
                         "event": "result",

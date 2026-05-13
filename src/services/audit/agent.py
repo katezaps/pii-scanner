@@ -17,6 +17,8 @@ import logging
 from functools import lru_cache
 from pathlib import Path
 
+import json
+
 from agents import Agent, Runner
 from playwright.async_api import BrowserContext
 
@@ -28,7 +30,7 @@ from src.services.audit.parsing import (
     partial_to_matches,
 )
 from src.services.browser import browser_context
-from src.services.tools import build_tools
+from src.services.tools import build_tools, make_find_opt_out_tool
 
 logger = logging.getLogger(__name__)
 
@@ -99,14 +101,48 @@ def build_prompt(search_url: str, identity: dict[str, str] | None) -> str:
 # ---------------------------------------------------------------------------
 
 
+async def _run_opt_out_discovery(
+    ctx: BrowserContext,
+    name: str,
+    search_url: str,
+    settings: AppSettings,
+) -> str | None:
+    """Run a separate agent to discover the opt-out URL for a broker."""
+    timeout_ms = settings.page_timeout_seconds * 1000
+    agent = Agent(
+        name=f"opt-out-{name}",
+        model=settings.openai_model,
+        instructions=(
+            "You are discovering the data opt-out or removal page for a data broker. "
+            "Call find_opt_out on the URL provided and report the results as JSON."
+        ),
+        tools=[make_find_opt_out_tool(ctx, timeout_ms=timeout_ms * 2)],
+    )
+    try:
+        result = await Runner.run(agent, input=f"Find the opt-out page for {search_url}")
+        for item in result.new_items:
+            if hasattr(item, "output") and isinstance(item.output, str):
+                try:
+                    tool_out = json.loads(item.output)
+                    pages = tool_out.get("opt_out_pages", [])
+                    if pages and isinstance(pages[0], dict):
+                        return pages[0].get("url")
+                except (json.JSONDecodeError, TypeError):
+                    pass
+    except Exception as e:
+        logger.debug("opt-out discovery failed for %s: %s", name, e)
+    return None
+
+
 async def audit_broker(
     name: str,
     search_url: str,
     identity: dict[str, str] | None = None,
     *,
     settings: AppSettings,
+    db_opt_out_url: str | None = None,
 ) -> AuditAgentResult:
-    """Run a single agent against one broker and return structured results."""
+    """Run a scan agent and opt-out discovery agent in parallel."""
     timeout = settings.agent_timeout_seconds
     partial_results: dict[str, bool] = {}
 
@@ -122,8 +158,31 @@ async def audit_broker(
         prompt = build_prompt(search_url, identity)
         runner_task = asyncio.create_task(Runner.run(agent, input=prompt))
 
+        # Run opt-out discovery in parallel if not cached
+        opt_out_task = None
+        if db_opt_out_url is None:
+            opt_out_task = asyncio.create_task(
+                _run_opt_out_discovery(ctx, name, search_url, settings)
+            )
+
+        pending = {runner_task}
+        if opt_out_task is not None:
+            pending.add(opt_out_task)
+
         try:
-            done, _ = await asyncio.wait({runner_task}, timeout=timeout)
+            done, still_pending = await asyncio.wait(pending, timeout=timeout)
+
+            # Resolve opt-out URL: cached > discovered > None
+            opt_out_url = db_opt_out_url
+            if opt_out_task is not None:
+                if opt_out_task in done:
+                    opt_out_url = opt_out_task.result()
+                else:
+                    opt_out_task.cancel()
+                    try:
+                        await opt_out_task
+                    except (asyncio.CancelledError, Exception):
+                        pass  # noqa: S110
 
             if runner_task in done:
                 result = runner_task.result()
@@ -146,6 +205,7 @@ async def audit_broker(
                     message=meta["message"],
                     input_fields_found=input_fields_found,
                     matched_inputs=matched_inputs,
+                    opt_out_url=opt_out_url,
                 )
 
             # Timeout — force-close browser context to kill Playwright,
@@ -169,6 +229,7 @@ async def audit_broker(
                 content_length=None,
                 message="Completed at timeout.",
                 matched_inputs=partial_to_matches(partial_results),
+                opt_out_url=opt_out_url,
             )
 
         except asyncio.CancelledError:
@@ -178,10 +239,14 @@ async def audit_broker(
             except Exception:
                 pass  # noqa: S110
             runner_task.cancel()
-            try:
-                await runner_task
-            except (asyncio.CancelledError, Exception):
-                pass  # noqa: S110
+            if opt_out_task is not None:
+                opt_out_task.cancel()
+            for t in [runner_task, opt_out_task]:
+                if t is not None:
+                    try:
+                        await t
+                    except (asyncio.CancelledError, Exception):
+                        pass  # noqa: S110
             return AuditAgentResult(
                 name=name,
                 search_url=search_url,
@@ -189,6 +254,7 @@ async def audit_broker(
                 content_length=None,
                 message="Completed at timeout.",
                 matched_inputs=partial_to_matches(partial_results),
+                opt_out_url=db_opt_out_url,
             )
 
         except Exception as e:
@@ -200,4 +266,5 @@ async def audit_broker(
                 content_length=None,
                 message=str(e),
                 matched_inputs=partial_to_matches(partial_results),
+                opt_out_url=db_opt_out_url,
             )

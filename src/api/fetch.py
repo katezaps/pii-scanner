@@ -100,6 +100,7 @@ async def fetch_scan(
             state=ScanState(row["state"]),
             found=row["found"],
             message=row["message"],
+            opt_out_url=row["opt_out_url"],
         )
         for row in rows
     ]

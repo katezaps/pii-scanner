@@ -12,10 +12,26 @@ export interface BrokerRowData {
   message: string | null;
   fields: BrokerFieldResult[];
   foundCount: number;
+  optOutUrl: string | null;
 }
 
 interface BrokerRowProps {
   row: BrokerRowData;
+}
+
+function OptOutRow({ url }: { url: string | null }) {
+  return (
+    <div className="broker-row__pill-section">
+      <span className="broker-row__pill-header">Opt Out</span>
+      {url ? (
+        <p className="broker-row__empty">
+          <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>
+        </p>
+      ) : (
+        <p className="broker-row__empty">Opt out link unavailable</p>
+      )}
+    </div>
+  );
 }
 
 export default function BrokerRow({ row }: BrokerRowProps) {
@@ -78,6 +94,7 @@ export default function BrokerRow({ row }: BrokerRowProps) {
                   <p className="broker-row__empty">No fields detected before cancellation</p>
                 )}
               </div>
+              <OptOutRow url={row.optOutUrl} />
             </>
           )}
           {isFailed && (
@@ -99,14 +116,19 @@ export default function BrokerRow({ row }: BrokerRowProps) {
                   <p className="broker-row__empty">No fields detected before failure</p>
                 )}
               </div>
+              <OptOutRow url={row.optOutUrl} />
             </>
           )}
           {!isIncomplete && !hasMatches && (
-            <p className="broker-row__clear-msg">
-              No identity fields matched any form inputs on this site.
-            </p>
+            <>
+              <p className="broker-row__clear-msg">
+                No identity fields matched any form inputs on this site.
+              </p>
+              <OptOutRow url={row.optOutUrl} />
+            </>
           )}
           {hasMatches && !isIncomplete && (
+            <>
             <div className="broker-row__pill-section">
               <span className="broker-row__pill-header">PII Detected</span>
               <div className="broker-row__pill-list">
@@ -117,6 +139,8 @@ export default function BrokerRow({ row }: BrokerRowProps) {
                 ))}
               </div>
             </div>
+            <OptOutRow url={row.optOutUrl} />
+            </>
           )}
         </div>
       )}

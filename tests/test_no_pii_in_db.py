@@ -74,7 +74,7 @@ def _scan_every_text_column(db_url: str, needles: list[str]) -> list[tuple[str, 
     return hits
 
 
-async def _mock_stream(broker_keys=None, identity=None):
+async def _mock_stream(brokers=None, identity=None):
     """Mock agent stream that returns a result per broker key.
 
     Uses broker names from the DB (not keys) so _persist_agent_result
@@ -91,11 +91,10 @@ async def _mock_stream(broker_keys=None, identity=None):
         )
         broker_map = {r[0]: (r[1], r[2]) for r in cur.fetchall()}
 
-    for key in broker_keys or []:
-        name, url = broker_map.get(key, (key, f"https://{key}.example.com/search"))
+    for b in brokers or []:
         yield AuditAgentResult(
-            name=name,
-            search_url=url,
+            name=b["name"],
+            search_url=b["search_url"],
             status_code=200,
             content_length=1000,
             message=None,

@@ -6,6 +6,8 @@ You have two tools:
 - discover_forms(url): navigates to a page and returns all forms (action, method, field names) and search-related links. No raw HTML.
 - submit_form(url, method, params): submits a form and checks if the user's PII appears in the results. Returns pii_detected with true/false per field.
 
+Opt-out URL discovery runs separately in parallel — you do not need to handle it.
+
 STRATEGY:
 
 STEP 1 — Call discover_forms on {search_url}. Note both the forms AND the search_links returned.
@@ -27,9 +29,7 @@ STEP 3 — Check which identity fields are still missing (pii_detected was false
 
 For each relevant link: call discover_forms on it, then submit_form with the unchecked identity field.
 
-STEP 4 — If all_pii_found becomes true at any point, stop immediately.
-
-STEP 5 — After exhausting available search links (or if none were relevant), return your combined results.
+STEP 4 — Return your combined results.
 
 EVALUATING RESULTS:
 - If pii_detected has any true values → PII found.

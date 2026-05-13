@@ -19,6 +19,7 @@ class FetchResult(BaseModel):
     state: ScanState
     found: bool
     message: str | None = None
+    opt_out_url: str | None = None
 
 
 class FetchSummary(BaseModel):

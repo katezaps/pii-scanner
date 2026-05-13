@@ -127,6 +127,14 @@
   background: var(--teal-50);
 }
 
+.brokers__row--expanded {
+  background: var(--teal-50);
+}
+
+.brokers__row--expanded .brokers__td {
+  padding-top: 0;
+}
+
 .brokers__td {
   padding: 16px 20px;
   vertical-align: top;
@@ -183,6 +191,185 @@
   font-size: 0.85rem;
   font-weight: 400;
   color: var(--text);
+}
+
+/* ── Opt-out refresh button ───────────────────────────────────── */
+
+.brokers__detail--opt-out {
+  margin-left: auto;
+}
+
+.brokers__opt-out-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brokers__detail-empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.brokers__refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.brokers__refresh-btn:hover {
+  color: var(--teal-700);
+  border-color: var(--teal-200);
+  background: var(--teal-50);
+}
+
+/* ── Confirmation dialog ─────────────────────────────────────── */
+
+.brokers__overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  animation: brokers-fade-in 0.15s ease-out;
+}
+
+@keyframes brokers-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.brokers__dialog {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  animation: brokers-slide-in 0.2s ease-out;
+}
+
+.brokers__dialog-text {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.brokers__dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.brokers__dialog-btn {
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--sans);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.brokers__dialog-btn--cancel {
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid var(--border);
+}
+
+.brokers__dialog-btn--cancel:hover {
+  background: var(--teal-50);
+}
+
+.brokers__dialog-btn--confirm {
+  color: #fff;
+  background: #dc2626;
+  border: 1px solid #dc2626;
+}
+
+.brokers__dialog-btn--confirm:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.brokers__dialog-btn--approve {
+  color: #fff;
+  background: var(--teal-600);
+  border: 1px solid var(--teal-600);
+}
+
+.brokers__dialog-btn--approve:hover {
+  background: var(--teal-700);
+  border-color: var(--teal-700);
+}
+
+.brokers__dialog-text--error {
+  color: #dc2626;
+}
+
+/* ── Loading animation ───────────────────────────────────────── */
+
+.brokers__dialog-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.brokers__dots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.brokers__dots::before,
+.brokers__dots::after,
+.brokers__dots {
+  content: "";
+}
+
+.brokers__dots,
+.brokers__dots::before,
+.brokers__dots::after {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal-400);
+  animation: brokers-dot-pulse 1.2s ease-in-out infinite;
+}
+
+.brokers__dots::before {
+  animation-delay: -0.3s;
+}
+
+.brokers__dots::after {
+  animation-delay: 0.3s;
+}
+
+@keyframes brokers-dot-pulse {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ── URL column ───────────────────────────────────────────────── */

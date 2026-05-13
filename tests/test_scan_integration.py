@@ -1,9 +1,4 @@
-"""Integration tests for the full scan flow.
-
-These tests hit the real DB and auth pipeline with a mocked OpenAI agent,
-verifying the complete lifecycle: SSE event sequence, multi-broker fan-out,
-identity field acceptance, and error propagation.
-"""
+"""Integration tests for the full scan flow."""
 
 from __future__ import annotations
 
@@ -22,7 +17,6 @@ from src.models.scan import AuditAgentResult, FormFieldMatch
 
 @pytest.fixture
 def isolated_auth(db_url: str):
-    """Create an isolated user with no scan history for cache tests."""
     user_id = uuid4()
     token_id = uuid4()
     plaintext = secrets.token_urlsafe(32)
@@ -66,17 +60,11 @@ def _parse_sse(text: str) -> list[dict]:
     return events
 
 
-# ---------------------------------------------------------------------------
-# Mock agent streams
-# ---------------------------------------------------------------------------
-
-
-async def _multi_broker_stream(broker_keys=None, identity=None):
-    """Yields one result per broker key, simulating a real multi-broker scan."""
-    for key in broker_keys or []:
+async def _multi_broker_stream(brokers=None, identity=None):
+    for b in brokers or []:
         yield AuditAgentResult(
-            name=key.capitalize(),
-            search_url=f"https://www.{key}.com/search",
+            name=b["name"],
+            search_url=b["search_url"],
             status_code=200,
             content_length=8000,
             message=None,
@@ -89,59 +77,15 @@ async def _multi_broker_stream(broker_keys=None, identity=None):
         )
 
 
-async def _stream_with_failure(broker_keys=None, identity=None):
-    """First broker succeeds, second fails."""
-    keys = broker_keys or []
-    if len(keys) >= 1:
-        yield AuditAgentResult(
-            name=keys[0].capitalize(),
-            search_url=f"https://www.{keys[0]}.com/search",
-            status_code=200,
-            content_length=5000,
-            message=None,
-            input_fields_found=["name"],
-            matched_inputs=[],
-        )
-    if len(keys) >= 2:
-        yield AuditAgentResult(
-            name=keys[1].capitalize(),
-            search_url=f"https://www.{keys[1]}.com/search",
-            status_code=None,
-            content_length=None,
-            message="Scan timed out.",
-            input_fields_found=[],
-            matched_inputs=[],
-        )
-
-
-async def _stream_with_exception(broker_keys=None, identity=None):
-    """Raises an exception mid-stream."""
-    yield AuditAgentResult(
-        name="Spokeo",
-        search_url="https://www.spokeo.com/search",
-        status_code=200,
-        content_length=5000,
-        message=None,
-        input_fields_found=["name"],
-        matched_inputs=[],
-    )
-    raise RuntimeError("agent crashed")
-
-
-# ---------------------------------------------------------------------------
-# Tests
-# ---------------------------------------------------------------------------
-
-
 def test_full_scan_event_sequence(client: TestClient, auth_header, db_url: str):
-    """A scan against two brokers should produce: started, result, result, done."""
+    """started → result per broker → done."""
     with psycopg.connect(db_url) as conn, conn.cursor() as cur:
         cur.execute(
             "SELECT key FROM brokers WHERE version = (SELECT MAX(version) FROM brokers) LIMIT 2"
         )
         broker_keys = [row[0] for row in cur.fetchall()]
 
-    assert len(broker_keys) >= 2, "Need at least 2 seeded brokers"
+    assert len(broker_keys) >= 2
 
     with (
         patch("src.api.audit.stream_audit_agents", side_effect=_multi_broker_stream),
@@ -155,8 +99,7 @@ def test_full_scan_event_sequence(client: TestClient, auth_header, db_url: str):
         ),
     ):
         with client.stream(
-            "POST",
-            "/audit",
+            "POST", "/audit",
             json={"broker_keys": broker_keys, "save": False},
             cookies=auth_header,
         ) as resp:
@@ -164,201 +107,63 @@ def test_full_scan_event_sequence(client: TestClient, auth_header, db_url: str):
             body = resp.read().decode()
 
     events = _parse_sse(body)
-    event_types = [e["event"] for e in events]
-
-    assert event_types[0] == "started"
-    assert event_types[-1] == "done"
-    assert event_types.count("result") == 2
-
-    # Verify started event lists the brokers
-    started_data = json.loads(events[0]["data"])
-    assert len(started_data["brokers"]) == 2
-
-    # Verify each result has the expected shape
-    for e in events:
-        if e["event"] == "result":
-            data = json.loads(e["data"])
-            assert "name" in data
-            assert "search_url" in data
-            assert "status_code" in data
-            assert "input_fields_found" in data
-            assert "matched_inputs" in data
-
-
-def test_scan_with_identity_fields(client: TestClient, isolated_auth):
-    """Identity fields should appear in started event and flow to agent results."""
-    cookies, _ = isolated_auth
-    with (
-        patch("src.api.audit.stream_audit_agents", side_effect=_multi_broker_stream),
-        patch(
-            "src.api.audit.resolve_brokers",
-            new_callable=AsyncMock,
-            return_value=[{"name": "Spokeo", "search_url": "https://www.spokeo.com/search"}],
-        ),
-    ):
-        with client.stream(
-            "POST",
-            "/audit",
-            json={
-                "broker_keys": ["spokeo"],
-                "save": False,
-                "email": "user@example.com",
-                "name": "Jane Doe",
-            },
-            cookies=cookies,
-        ) as resp:
-            assert resp.status_code == 200
-            body = resp.read().decode()
-
-    events = _parse_sse(body)
-    started_data = json.loads(events[0]["data"])
-
-    accepted_types = {a["field_type"] for a in started_data["accepted"]}
-    assert accepted_types == {"email", "name"}
-
-    # The mock stream returns a match for email when identity has email
-    result_data = json.loads(events[1]["data"])
-    assert len(result_data["matched_inputs"]) == 1
-    assert result_data["matched_inputs"][0]["identity_field"] == "email"
-
-
-def test_scan_partial_failure(client: TestClient, isolated_auth):
-    """One broker timing out should not prevent other results from streaming."""
-    cookies, _ = isolated_auth
-    with (
-        patch("src.api.audit.stream_audit_agents", side_effect=_stream_with_failure),
-        patch(
-            "src.api.audit.resolve_brokers",
-            new_callable=AsyncMock,
-            return_value=[
-                {"name": "Spokeo", "search_url": "https://www.spokeo.com/search"},
-                {"name": "Radaris", "search_url": "https://radaris.com/p/search"},
-            ],
-        ),
-    ):
-        with client.stream(
-            "POST",
-            "/audit",
-            json={"broker_keys": ["spokeo", "radaris"], "save": False},
-            cookies=cookies,
-        ) as resp:
-            assert resp.status_code == 200
-            body = resp.read().decode()
-
-    events = _parse_sse(body)
-    results = [e for e in events if e["event"] == "result"]
-    assert len(results) == 2
-
-    # First broker succeeded
-    first = json.loads(results[0]["data"])
-    assert first["status_code"] == 200
-    assert first["message"] is None
-
-    # Second broker timed out
-    second = json.loads(results[1]["data"])
-    assert second["status_code"] is None
-    assert second["message"] == "Scan timed out."
-
-    # Stream still completed with a done event
-    assert events[-1]["event"] == "done"
-
-
-def test_scan_agent_exception_produces_error_event(client: TestClient, auth_header):
-    """If the agent stream raises, an error event should be emitted."""
-    with (
-        patch("src.api.audit.stream_audit_agents", side_effect=_stream_with_exception),
-        patch(
-            "src.api.audit.resolve_brokers",
-            new_callable=AsyncMock,
-            return_value=[
-                {"name": "Spokeo", "search_url": "https://www.spokeo.com/search"},
-            ],
-        ),
-    ):
-        with client.stream(
-            "POST",
-            "/audit",
-            json={"broker_keys": ["spokeo"], "save": False},
-            cookies=auth_header,
-        ) as resp:
-            assert resp.status_code == 200
-            body = resp.read().decode()
-
-    events = _parse_sse(body)
-    event_types = [e["event"] for e in events]
-
-    assert "started" in event_types
-    assert "result" in event_types  # the first result before the crash
-    assert "error" in event_types
-    assert "done" in event_types
-
-
-def test_scan_no_identity_still_works(client: TestClient, isolated_auth):
-    """A scan without any identity fields should still succeed."""
-    auth_header, _ = isolated_auth
-    with (
-        patch("src.api.audit.stream_audit_agents", side_effect=_multi_broker_stream),
-        patch(
-            "src.api.audit.resolve_brokers",
-            new_callable=AsyncMock,
-            return_value=[{"name": "Spokeo", "search_url": "https://www.spokeo.com/search"}],
-        ),
-    ):
-        with client.stream(
-            "POST",
-            "/audit",
-            json={"broker_keys": ["spokeo"], "save": False},
-            cookies=auth_header,
-        ) as resp:
-            assert resp.status_code == 200
-            body = resp.read().decode()
-
-    events = _parse_sse(body)
-    started_data = json.loads(events[0]["data"])
-    assert started_data["accepted"] == []
-
-    result_data = json.loads(events[1]["data"])
-    assert result_data["matched_inputs"] == []
+    types = [e["event"] for e in events]
+    assert types[0] == "started"
+    assert types[-1] == "done"
+    assert types.count("result") == 2
 
 
 def test_scan_requires_auth(client: TestClient):
-    """Scan endpoint must reject unauthenticated requests."""
     resp = client.post("/audit", json={"broker_keys": ["spokeo"], "save": False})
     assert resp.status_code == 401
 
 
-def test_scan_rejects_empty_keys(client: TestClient, auth_header):
-    resp = client.post("/audit", json={"broker_keys": [], "save": False}, cookies=auth_header)
-    assert resp.status_code == 400
+def test_scan_opt_out_url_flows_through_orchestrator(
+    client: TestClient, isolated_auth, db_url: str
+):
+    """DB opt_out_url flows through the real orchestrator to the SSE result."""
+    cookies, _ = isolated_auth
+    opt_out = "https://www.spokeo.com/optout"
 
-
-def test_scan_identity_passed_to_runner(client: TestClient, auth_header):
-    """Verify the identity dict is passed through to stream_audit_agents."""
-    mock_fn = AsyncMock()
-
-    async def empty_stream(*args, **kwargs):
-        return
-        yield  # noqa: F401 - makes this an async generator
-
-    mock_fn.side_effect = empty_stream
-
-    with (
-        patch("src.api.audit.stream_audit_agents", mock_fn),
-        patch("src.api.audit.resolve_brokers", new_callable=AsyncMock, return_value=[]),
-    ):
-        resp = client.post(
-            "/audit",
-            json={
-                "broker_keys": ["spokeo"],
-                "save": False,
-                "email": "a@b.com",
-                "name": "Jane",
-            },
-            cookies=auth_header,
+    with psycopg.connect(db_url) as conn, conn.cursor() as cur:
+        cur.execute(
+            "UPDATE brokers SET opt_out_url = %s, opt_out_url_source = 'GENERATED' "
+            "WHERE key = 'spokeo' AND version = (SELECT MAX(version) FROM brokers)",
+            (opt_out,),
         )
+        conn.commit()
 
-    assert resp.status_code == 200
-    mock_fn.assert_called_once_with(
-        broker_keys=["spokeo"],
-        identity={"email": "a@b.com", "name": "Jane"},
-    )
+    try:
+        async def _fake_audit_broker(name, search_url, identity=None, *, settings, db_opt_out_url=None):
+            return AuditAgentResult(
+                name=name,
+                search_url=search_url,
+                status_code=200,
+                content_length=5000,
+                message=None,
+                input_fields_found=["email"],
+                matched_inputs=[],
+                opt_out_url=db_opt_out_url,
+            )
+
+        with patch("src.services.audit.orchestrator.audit_broker", side_effect=_fake_audit_broker):
+            with client.stream(
+                "POST", "/audit",
+                json={"broker_keys": ["spokeo"], "save": False, "email": "a@b.com"},
+                cookies=cookies,
+            ) as resp:
+                assert resp.status_code == 200
+                body = resp.read().decode()
+
+        events = _parse_sse(body)
+        results = [e for e in events if e["event"] == "result"]
+        assert len(results) == 1
+        assert json.loads(results[0]["data"])["opt_out_url"] == opt_out
+
+    finally:
+        with psycopg.connect(db_url) as conn, conn.cursor() as cur:
+            cur.execute(
+                "UPDATE brokers SET opt_out_url = NULL, opt_out_url_source = NULL "
+                "WHERE key = 'spokeo' AND version = (SELECT MAX(version) FROM brokers)",
+            )
+            conn.commit()

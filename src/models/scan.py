@@ -21,3 +21,4 @@ class AuditAgentResult:
     message: str | None
     input_fields_found: list[str] = field(default_factory=list)
     matched_inputs: list[FormFieldMatch] = field(default_factory=list)
+    opt_out_url: str | None = None
