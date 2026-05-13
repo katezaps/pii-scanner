@@ -51,23 +51,23 @@ export default function BrokerRow({ row }: BrokerRowProps) {
         <span className="broker-row__name">{row.name}</span>
         <div className="broker-row__output">
           {isCancelled ? (
-            <span className="broker-row__status broker-row__status--cancelled">
+            <span className="status-label status-label--cancelled">
               CANCELLED ({row.foundCount})
             </span>
           ) : isFailed ? (
-            <span className="broker-row__status broker-row__status--failed">
+            <span className="status-label status-label--failed">
               FAILED ({row.foundCount})
             </span>
           ) : hasMatches ? (
-            <span className="broker-row__status broker-row__status--detected">
+            <span className="status-label status-label--detected">
               DETECTED PII ({row.foundCount})
             </span>
           ) : (
-            <span className="broker-row__status broker-row__status--clear">
+            <span className="status-label status-label--clear">
               CLEAR (0)
             </span>
           )}
-          <span className={`broker-row__chevron ${open ? "broker-row__chevron--open" : ""}`}>
+          <span className={`chevron ${open ? "chevron--open" : ""}`}>
             &#x276F;
           </span>
         </div>
@@ -77,7 +77,7 @@ export default function BrokerRow({ row }: BrokerRowProps) {
         <div className="broker-row__expanded">
           {isCancelled && (
             <>
-              <div className="broker-row__msg broker-row__msg--cancelled">
+              <div className="msg-box msg-box--amber" style={{ marginTop: 8, marginBottom: 10 }}>
                 {row.message ?? "This scan was cancelled before this broker could be checked."}
               </div>
               <div className="broker-row__pill-section">
@@ -85,7 +85,7 @@ export default function BrokerRow({ row }: BrokerRowProps) {
                 {row.fields.filter((f) => f.found).length > 0 ? (
                   <div className="broker-row__pill-list">
                     {row.fields.filter((f) => f.found).map((f) => (
-                      <span key={f.field_type} className="broker-row__pill broker-row__pill--cancelled">
+                      <span key={f.field_type} className="tag tag--amber">
                         {f.field_type}
                       </span>
                     ))}
@@ -99,7 +99,7 @@ export default function BrokerRow({ row }: BrokerRowProps) {
           )}
           {isFailed && (
             <>
-              <div className="broker-row__msg broker-row__msg--error">
+              <div className="msg-box msg-box--red" style={{ marginTop: 8, marginBottom: 10 }}>
                 Error: {row.message ?? "Broker agent encountered an error during scanning."}
               </div>
               <div className="broker-row__pill-section">
@@ -107,7 +107,7 @@ export default function BrokerRow({ row }: BrokerRowProps) {
                 {row.fields.filter((f) => f.found).length > 0 ? (
                   <div className="broker-row__pill-list">
                     {row.fields.filter((f) => f.found).map((f) => (
-                      <span key={f.field_type} className="broker-row__pill broker-row__pill--failed">
+                      <span key={f.field_type} className="tag tag--red">
                         {f.field_type}
                       </span>
                     ))}
@@ -121,7 +121,7 @@ export default function BrokerRow({ row }: BrokerRowProps) {
           )}
           {!isIncomplete && !hasMatches && (
             <>
-              <p className="broker-row__clear-msg">
+              <p className="msg-box msg-box--green" style={{ marginTop: 8 }}>
                 No identity fields matched any form inputs on this site.
               </p>
               <OptOutRow url={row.optOutUrl} />
@@ -133,7 +133,7 @@ export default function BrokerRow({ row }: BrokerRowProps) {
               <span className="broker-row__pill-header">PII Detected</span>
               <div className="broker-row__pill-list">
                 {row.fields.filter((f) => f.found).map((f) => (
-                  <span key={f.field_type} className="broker-row__pill broker-row__pill--detected">
+                  <span key={f.field_type} className="tag tag--red">
                     {f.field_type}
                   </span>
                 ))}

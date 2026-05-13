@@ -50,7 +50,7 @@
   border-left: 3px solid var(--red);
 }
 
-/* ── Name ────────────────────────────────────────────────────── */
+/* ── Name + output ───────────────────────────────────────────── */
 
 .broker-row__name {
   font-weight: 600;
@@ -60,95 +60,30 @@
   flex-shrink: 0;
 }
 
-/* ── Output ──────────────────────────────────────────────────── */
-
 .broker-row__output {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* ── Status labels ───────────────────────────────────────────── */
-
-.broker-row__status {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.broker-row__status--detected {
-  color: var(--red);
-}
-
-.broker-row__status--clear {
-  color: var(--green);
-}
-
-.broker-row__status--failed {
-  color: var(--text-muted);
-}
-
-.broker-row__status--cancelled {
-  color: var(--amber);
-}
-
-/* ── Chevron ─────────────────────────────────────────────────── */
-
-.broker-row__chevron {
-  display: inline-block;
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  transition: transform 0.2s ease;
-}
-
-.broker-row__chevron--open {
-  transform: rotate(90deg);
-}
-
 /* ── Expanded detail ─────────────────────────────────────────── */
 
 .broker-row__expanded {
   padding: 0 20px 12px;
-  animation: broker-row-expand 0.15s ease-out;
-}
-
-@keyframes broker-row-expand {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  animation: expand-in 0.15s ease-out;
 }
 
 .broker-row__msg {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  padding: 8px 12px;
   margin-top: 8px;
   margin-bottom: 10px;
-  background: var(--bg-inset);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
   color: var(--text-muted);
 }
 
-.broker-row__msg--cancelled {
-  color: var(--amber);
-}
-
-.broker-row__msg--error {
-  color: var(--red);
-}
+.broker-row__msg--cancelled { color: var(--amber); }
+.broker-row__msg--error { color: var(--red); }
 
 .broker-row__clear-msg {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--green);
-  padding: 8px 12px;
   margin-top: 8px;
-  background: var(--green-dim);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
 }
 
 /* ── Pills ───────────────────────────────────────────────────── */
@@ -179,33 +114,9 @@
   justify-content: flex-end;
 }
 
-.broker-row__pill {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 3px 10px;
-  border-radius: var(--radius-sm);
-  text-transform: lowercase;
-  white-space: nowrap;
-}
-
-.broker-row__pill--detected {
-  color: var(--red);
-  background: var(--red-dim);
-  border: 1px solid rgba(255, 107, 107, 0.25);
-}
-
-.broker-row__pill--cancelled {
-  color: var(--amber);
-  background: var(--amber-dim);
-  border: 1px solid rgba(251, 191, 36, 0.25);
-}
-
-.broker-row__pill--failed {
-  color: var(--red);
-  background: var(--red-dim);
-  border: 1px solid rgba(255, 107, 107, 0.25);
-}
+.broker-row__pill--detected { /* inherits .tag .tag--red */ }
+.broker-row__pill--cancelled { /* inherits .tag .tag--amber */ }
+.broker-row__pill--failed { /* inherits .tag .tag--red */ }
 
 .broker-row__empty {
   color: var(--text-muted);

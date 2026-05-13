@@ -1,0 +1,141 @@
+.checklist {
+  padding: 24px;
+}
+
+.checklist__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.checklist__toggle {
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--border);
+}
+
+.checklist__toggle:hover {
+  border-color: var(--accent);
+}
+
+.checklist__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checklist__item {
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+
+.checklist__item:hover {
+  background: var(--bg-inset);
+}
+
+.checklist__label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.checklist__checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checklist__name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.checklist__url {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Submit bar ──────────────────────────────────────────────── */
+
+.checklist__submit-bar {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.checklist__options {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.checklist__save-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.checklist__save-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.checklist__name-wrap {
+  position: relative;
+}
+
+.checklist__scan-name {
+  font-size: 0.8rem;
+  width: 180px;
+}
+
+.checklist__scan-name--conflict {
+  border-color: var(--red);
+  background: var(--red-dim);
+}
+
+.checklist__scan-name--conflict:focus {
+  border-color: var(--red);
+}
+
+.checklist__name-error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--red);
+  white-space: nowrap;
+}
+
+.checklist__submit {
+  flex: 1;
+  padding: 14px;
+  font-size: 0.9rem;
+}
