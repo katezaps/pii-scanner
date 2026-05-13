@@ -6,25 +6,9 @@
   padding: 0 24px 64px;
 }
 
-.brokers__glow {
-  position: absolute;
-  top: -60px;
-  left: 50%;
-  translate: -50% 0;
-  width: 480px;
-  height: 260px;
-  background: radial-gradient(
-    ellipse at center,
-    var(--accent-glow) 0%,
-    transparent 70%
-  );
-  pointer-events: none;
-}
-
 /* ── Header ──────────────────────────────────────────────────── */
 
 .brokers__header {
-  position: relative;
   text-align: center;
   padding: 48px 0 32px;
 }
@@ -36,45 +20,45 @@
 
 .brokers__back {
   padding: 10px 20px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  font-family: var(--sans);
-  color: var(--accent);
+  font-family: var(--font-mono);
+  color: var(--text-muted);
   background: none;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: border-color 0.15s, color 0.15s;
 }
 
 .brokers__back:hover {
-  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .brokers__title {
-  font-size: 2.25rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  letter-spacing: -1px;
-  background: linear-gradient(135deg, var(--teal-700), var(--teal-400));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  letter-spacing: -0.5px;
+  color: var(--accent);
 }
 
 .brokers__subtitle {
   margin-top: 8px;
-  font-size: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
 .brokers__error {
   margin-top: 16px;
   padding: 12px 16px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  color: #dc2626;
-  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--red-dim);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+  border-radius: var(--radius-sm);
+  color: var(--red);
 }
 
 /* ── Table ────────────────────────────────────────────────────── */
@@ -82,11 +66,10 @@
 .brokers__table-wrap {
   width: 100%;
   max-width: 800px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  background: var(--surface);
+  border: 2px solid var(--border);
+  background: var(--bg-raised);
 }
 
 .brokers__table {
@@ -97,12 +80,13 @@
 .brokers__th {
   padding: 14px 20px;
   text-align: left;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--teal-700);
-  background: var(--teal-50);
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  background: var(--bg-inset);
   border-bottom: 2px solid var(--border);
 }
 
@@ -116,19 +100,19 @@
 }
 
 .brokers__row:not(:last-child) .brokers__td {
-  border-bottom: 1px solid var(--teal-100);
+  border-bottom: 1px solid var(--border);
 }
 
 .brokers__row:hover {
-  background: var(--teal-50);
+  background: var(--bg-inset);
 }
 
 .brokers__row--open {
-  background: var(--teal-50);
+  background: var(--bg-inset);
 }
 
 .brokers__row--expanded {
-  background: var(--teal-50);
+  background: var(--bg-inset);
 }
 
 .brokers__row--expanded .brokers__td {
@@ -136,9 +120,9 @@
 }
 
 .brokers__td {
-  padding: 16px 20px;
+  padding: 14px 20px;
   vertical-align: top;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .brokers__td--name {
@@ -158,7 +142,7 @@
   gap: 12px 24px;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px dashed var(--teal-200);
+  border-top: 1px solid var(--border);
   animation: brokers-slide-in 0.2s ease-out;
 }
 
@@ -179,12 +163,17 @@
   gap: 2px;
 }
 
+.brokers__detail--opt-out {
+  margin-left: auto;
+}
+
 .brokers__detail-label {
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--teal-600);
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
 }
 
 .brokers__detail-value {
@@ -193,10 +182,9 @@
   color: var(--text);
 }
 
-/* ── Opt-out refresh button ───────────────────────────────────── */
-
-.brokers__detail--opt-out {
-  margin-left: auto;
+.brokers__detail-empty {
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .brokers__opt-out-value {
@@ -205,10 +193,40 @@
   gap: 6px;
 }
 
-.brokers__detail-empty {
-  color: var(--text-muted);
-  font-style: italic;
+/* ── URL column ───────────────────────────────────────────────── */
+
+.brokers__link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  word-break: break-all;
+  transition: opacity 0.15s;
 }
+
+.brokers__link:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+/* ── Chevron ──────────────────────────────────────────────────── */
+
+.brokers__td--chevron {
+  text-align: center;
+  width: 40px;
+}
+
+.brokers__chevron {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  transition: transform 0.2s ease;
+}
+
+.brokers__chevron--open {
+  transform: rotate(90deg);
+}
+
+/* ── Opt-out refresh button ───────────────────────────────────── */
 
 .brokers__refresh-btn {
   display: inline-flex;
@@ -219,19 +237,18 @@
   padding: 0;
   font-size: 0.9rem;
   line-height: 1;
-  color: var(--text-muted);
+  color: var(--text-dim);
   background: none;
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  transition: color 0.15s, border-color 0.15s;
   flex-shrink: 0;
 }
 
 .brokers__refresh-btn:hover {
-  color: var(--teal-700);
-  border-color: var(--teal-200);
-  background: var(--teal-50);
+  color: var(--accent);
+  border-color: var(--border-strong);
 }
 
 /* ── Confirmation dialog ─────────────────────────────────────── */
@@ -242,7 +259,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.7);
   z-index: 1000;
   animation: brokers-fade-in 0.15s ease-out;
 }
@@ -254,20 +271,25 @@
 
 .brokers__dialog {
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-md);
   padding: 24px;
   max-width: 380px;
   width: 90%;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
   animation: brokers-slide-in 0.2s ease-out;
 }
 
 .brokers__dialog-text {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--text);
   margin: 0 0 20px;
   line-height: 1.5;
+}
+
+.brokers__dialog-text--error {
+  color: var(--red);
+  font-family: var(--font-mono);
 }
 
 .brokers__dialog-actions {
@@ -278,48 +300,42 @@
 
 .brokers__dialog-btn {
   padding: 8px 18px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  font-family: var(--sans);
-  border-radius: 6px;
+  font-family: var(--font-mono);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: border-color 0.15s, opacity 0.15s;
 }
 
 .brokers__dialog-btn--cancel {
   color: var(--text-muted);
   background: none;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
 }
 
 .brokers__dialog-btn--cancel:hover {
-  background: var(--teal-50);
+  border-color: var(--border-strong);
 }
 
 .brokers__dialog-btn--confirm {
-  color: #fff;
-  background: #dc2626;
-  border: 1px solid #dc2626;
+  color: var(--bg);
+  background: var(--red);
+  border: 2px solid var(--red);
 }
 
 .brokers__dialog-btn--confirm:hover {
-  background: #b91c1c;
-  border-color: #b91c1c;
+  opacity: 0.85;
 }
 
 .brokers__dialog-btn--approve {
-  color: #fff;
-  background: var(--teal-600);
-  border: 1px solid var(--teal-600);
+  color: var(--bg);
+  background: var(--accent);
+  border: 2px solid var(--accent);
 }
 
 .brokers__dialog-btn--approve:hover {
-  background: var(--teal-700);
-  border-color: var(--teal-700);
-}
-
-.brokers__dialog-text--error {
-  color: #dc2626;
+  opacity: 0.85;
 }
 
 /* ── Loading animation ───────────────────────────────────────── */
@@ -349,7 +365,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--teal-400);
+  background: var(--accent);
   animation: brokers-dot-pulse 1.2s ease-in-out infinite;
 }
 
@@ -363,7 +379,7 @@
 
 @keyframes brokers-dot-pulse {
   0%, 80%, 100% {
-    opacity: 0.3;
+    opacity: 0.2;
     transform: scale(0.8);
   }
   40% {
@@ -372,44 +388,11 @@
   }
 }
 
-/* ── URL column ───────────────────────────────────────────────── */
-
-.brokers__link {
-  color: var(--teal-600);
-  text-decoration: none;
-  font-size: 0.85rem;
-  word-break: break-all;
-  transition: color 0.15s;
-}
-
-.brokers__link:hover {
-  color: var(--teal-800);
-  text-decoration: underline;
-}
-
-/* ── Chevron ──────────────────────────────────────────────────── */
-
-.brokers__td--chevron {
-  text-align: center;
-  width: 40px;
-}
-
-.brokers__chevron {
-  display: inline-block;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  transition: transform 0.2s ease;
-}
-
-.brokers__chevron--open {
-  transform: rotate(90deg);
-}
-
 /* ── Mobile ───────────────────────────────────────────────────── */
 
 @media (max-width: 600px) {
   .brokers__table-wrap {
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
   }
 
   .brokers__th,
@@ -418,12 +401,7 @@
   }
 
   .brokers__title {
-    font-size: 1.75rem;
-  }
-
-  .brokers__back {
-    position: static;
-    margin-bottom: 16px;
+    font-size: 1.5rem;
   }
 
   .brokers__details {

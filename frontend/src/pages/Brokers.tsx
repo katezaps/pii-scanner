@@ -63,8 +63,6 @@ export default function Brokers() {
 
   return (
     <div className="brokers">
-      <div className="brokers__glow" />
-
       <header className="brokers__header">
         <h1 className="brokers__title">Available Brokers</h1>
         <p className="brokers__subtitle">

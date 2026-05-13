@@ -45,7 +45,6 @@ export default function SignUp() {
 
   return (
     <div className="login">
-      <div className="login__glow" />
       <div className="login__card">
         <h1 className="login__title">Broker Audit</h1>
         <p className="login__subtitle">Create a new account</p>
