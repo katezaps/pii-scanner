@@ -1,0 +1,55 @@
+.history {
+  margin-top: 32px;
+  overflow: hidden;
+}
+
+.history__title {
+  padding: 20px 24px 0;
+  margin-bottom: 4px;
+}
+
+.history__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.history__item {
+  border-top: 1px solid var(--border);
+}
+
+.history__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.history__row:hover {
+  background: var(--bg-inset);
+}
+
+.history__label {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.history__summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.history__expanded {
+  padding: 0 16px 16px;
+  animation: expand-in 0.15s ease-out;
+}
+
+.history__broker-list {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}

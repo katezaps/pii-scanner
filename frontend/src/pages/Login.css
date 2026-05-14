@@ -4,49 +4,30 @@
   justify-content: center;
   min-height: 100dvh;
   padding: 24px;
-  position: relative;
-}
-
-.login__glow {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  translate: -50% -50%;
-  width: 500px;
-  height: 320px;
-  background: radial-gradient(
-    ellipse at center,
-    var(--accent-glow) 0%,
-    transparent 70%
-  );
-  pointer-events: none;
 }
 
 .login__card {
-  position: relative;
   width: 100%;
   max-width: 420px;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
+  background: var(--bg-raised);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
   padding: 48px 36px;
   box-shadow: var(--shadow-lg);
   text-align: center;
 }
 
 .login__title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  letter-spacing: -1px;
-  background: linear-gradient(135deg, var(--teal-700), var(--teal-400));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  letter-spacing: -0.5px;
+  color: var(--accent);
 }
 
 .login__subtitle {
   margin-top: 8px;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
   color: var(--text-muted);
 }
 
@@ -59,62 +40,65 @@
 }
 
 .login__label {
-  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
   font-weight: 600;
-  color: var(--teal-700);
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.08em;
 }
 
 .login__input {
   width: 100%;
   padding: 12px 16px;
-  font-size: 0.95rem;
-  font-family: var(--sans);
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
+  font-size: 0.9rem;
+  font-family: var(--font-mono);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
   color: var(--text);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.15s;
+}
+
+.login__input::placeholder {
+  color: var(--text-dim);
 }
 
 .login__input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  border-color: var(--border-strong);
 }
 
 .login__error {
-  font-size: 0.85rem;
-  color: #dc2626;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--red);
+  background: var(--red-dim);
+  border: 1px solid rgba(255, 107, 107, 0.25);
+  border-radius: var(--radius-sm);
   padding: 8px 12px;
-  margin: 0;
 }
 
 .login__submit {
   margin-top: 8px;
   padding: 12px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  font-family: var(--sans);
-  color: #fff;
-  background: linear-gradient(135deg, var(--teal-600), var(--teal-500));
-  border: none;
-  border-radius: 10px;
+  font-family: var(--font-mono);
+  color: var(--bg);
+  background: var(--accent);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
+  transition: opacity 0.15s;
 }
 
 .login__submit:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  opacity: 0.85;
 }
 
 .login__submit:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -125,7 +109,7 @@
 }
 
 .login__switch a {
-  color: var(--teal-600);
+  color: var(--accent);
   font-weight: 600;
   text-decoration: none;
 }
@@ -138,33 +122,34 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
+  background: var(--bg-inset);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 10px 14px;
 }
 
 .signup__token-value {
   flex: 1;
-  font-size: 0.85rem;
-  color: var(--teal-800);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
   word-break: break-all;
 }
 
 .signup__copy-btn {
   padding: 6px 14px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  font-family: var(--sans);
-  color: var(--teal-700);
-  background: var(--accent-light);
-  border: 1px solid var(--teal-200);
-  border-radius: 6px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(160, 240, 192, 0.25);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s;
+  transition: border-color 0.15s;
 }
 
 .signup__copy-btn:hover {
-  background: var(--teal-200);
+  border-color: var(--accent);
 }

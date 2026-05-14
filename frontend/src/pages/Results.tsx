@@ -1,44 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import type { FetchResult, FetchResponse, ScanListItem } from "../api";
 import BrokerRow from "../components/BrokerRow";
 import type { BrokerRowData } from "../components/BrokerRow";
 import { compareBrokerResults } from "../sort";
 import "./Results.css";
-
-interface FetchResult {
-  broker_id: string;
-  broker_name: string;
-  search_url: string;
-  field_type: string;
-  state: string;
-  found: boolean;
-  message: string | null;
-  opt_out_url: string | null;
-}
-
-interface FetchResponse {
-  execution_id: string;
-  name: string | null;
-  broker_version: number;
-  expires_at: string;
-  results: FetchResult[];
-  summary: {
-    total_brokers_scanned: number;
-    total_results: number;
-    found_count: number;
-  };
-}
-
-interface ScanListItem {
-  execution_id: string;
-  name: string | null;
-  state: string;
-  expires_at: string;
-  broker_count: number;
-  found_count: number;
-  incomplete_count: number;
-}
 
 function groupByBroker(results: FetchResult[]): BrokerRowData[] {
   const map = new Map<string, BrokerRowData>();

@@ -41,7 +41,6 @@ export default function Dashboard() {
   return (
     <div className="dash">
       <header className="dash__header">
-        <div className="dash__glow" />
         <h1 className="dash__logo">Broker Audit</h1>
         <p className="dash__subtitle">Personal data broker scanning service</p>
         <div className="dash__user-bar">

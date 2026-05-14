@@ -20,7 +20,6 @@ export default function Login() {
 
   return (
     <div className="login">
-      <div className="login__glow" />
       <div className="login__card">
         <h1 className="login__title">Broker Audit</h1>
         <p className="login__subtitle">Sign in with your credentials</p>

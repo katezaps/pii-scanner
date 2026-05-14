@@ -1,5 +1,5 @@
 .broker-row {
-  border-top: 1px solid var(--teal-100);
+  border-top: 1px solid var(--border);
 }
 
 .broker-row:first-child {
@@ -19,48 +19,46 @@
 }
 
 .broker-row__header:hover {
-  background: var(--teal-50);
+  background: var(--bg-inset);
 }
 
 .broker-row__header--detected {
-  background: #fef2f2;
-  border-left: 3px solid #dc2626;
+  background: var(--red-dim);
+  border-left: 3px solid var(--red);
 }
 
 .broker-row__header--detected:hover {
-  background: #fee2e2;
+  background: rgba(255, 107, 107, 0.15);
 }
 
 .broker-row__header--clear {
-  background: #f0fdf4;
-  border-left: 3px solid #16a34a;
+  background: var(--green-dim);
+  border-left: 3px solid var(--green);
 }
 
 .broker-row__header--warn {
-  background: #fffbeb;
-  border-left: 3px solid #d97706;
+  background: var(--amber-dim);
+  border-left: 3px solid var(--amber);
 }
 
 .broker-row__header--warn:hover {
-  background: #fef3c7;
+  background: rgba(251, 191, 36, 0.15);
 }
 
 .broker-row__header--error {
-  background: #fefafa;
-  border-left: 3px solid #dc2626;
+  background: var(--red-dim);
+  border-left: 3px solid var(--red);
 }
 
-/* ── Name ────────────────────────────────────────────────────── */
+/* ── Name + output ───────────────────────────────────────────── */
 
 .broker-row__name {
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--teal-800);
+  color: var(--text);
   white-space: nowrap;
   flex-shrink: 0;
 }
-
-/* ── Output ──────────────────────────────────────────────────── */
 
 .broker-row__output {
   display: flex;
@@ -68,84 +66,24 @@
   gap: 8px;
 }
 
-/* ── Status labels ───────────────────────────────────────────── */
-
-.broker-row__status {
-  font-size: 0.8rem;
-  font-weight: 700;
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.broker-row__status--detected {
-  color: #dc2626;
-  text-transform: none;
-}
-
-.broker-row__status--clear {
-  color: #16a34a;
-}
-
-.broker-row__status--failed {
-  color: #6b7280;
-}
-
-.broker-row__status--cancelled {
-  color: #d97706;
-}
-
-/* ── Chevron ─────────────────────────────────────────────────── */
-
-.broker-row__chevron {
-  display: inline-block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  transition: transform 0.2s ease;
-}
-
-.broker-row__chevron--open {
-  transform: rotate(90deg);
-}
-
 /* ── Expanded detail ─────────────────────────────────────────── */
 
 .broker-row__expanded {
   padding: 0 20px 12px;
-  animation: broker-row-expand 0.15s ease-out;
-}
-
-@keyframes broker-row-expand {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  animation: expand-in 0.15s ease-out;
 }
 
 .broker-row__msg {
-  font-size: 0.8rem;
-  padding: 8px 12px;
   margin-top: 8px;
   margin-bottom: 10px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  color: var(--text-muted);
 }
 
-.broker-row__msg--cancelled {
-  color: var(--teal-700);
-}
-
-.broker-row__msg--error {
-  color: var(--teal-700);
-}
+.broker-row__msg--cancelled { color: var(--amber); }
+.broker-row__msg--error { color: var(--red); }
 
 .broker-row__clear-msg {
-  font-size: 0.8rem;
-  color: var(--teal-700);
-  padding: 8px 12px;
   margin-top: 8px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
 }
 
 /* ── Pills ───────────────────────────────────────────────────── */
@@ -157,10 +95,11 @@
 
 .broker-row__pill-header {
   display: block;
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
   padding-bottom: 6px;
   margin-bottom: 6px;
@@ -170,42 +109,18 @@
 .broker-row__pill-list {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
-.broker-row__pill {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 4px 14px;
-  border-radius: 999px;
-  text-transform: capitalize;
-  white-space: nowrap;
-}
-
-.broker-row__pill--detected {
-  color: #b91c1c;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-}
-
-.broker-row__pill--cancelled {
-  color: #92400e;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-}
-
-.broker-row__pill--failed {
-  color: #dc2626;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-}
+.broker-row__pill--detected { /* inherits .tag .tag--red */ }
+.broker-row__pill--cancelled { /* inherits .tag .tag--amber */ }
+.broker-row__pill--failed { /* inherits .tag .tag--red */ }
 
 .broker-row__empty {
   color: var(--text-muted);
-  font-style: italic;
-  font-weight: 400;
-  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
   margin-top: 8px;
 }

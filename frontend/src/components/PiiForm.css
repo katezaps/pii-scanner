@@ -1,0 +1,47 @@
+.pii-form {
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.pii-form__title {
+  color: var(--accent);
+}
+
+.pii-form__hint {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+.pii-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .pii-form__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pii-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pii-form__label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pii-form__input {
+  font-size: 0.9rem;
+}
